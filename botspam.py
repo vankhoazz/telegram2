@@ -43,7 +43,8 @@ def spam_job():
     print(f"HOÀN THÀNH 1 VÒNG – ĐÃ GỬI {sent}/{len(GROUP_IDS)} NHÓM – {time.strftime('%H:%M %d/%m')}")
 
 # GỬI MỖI 30 PHÚT 1 LẦN – 48 LẦN/NGÀY
-schedule.every(30).minutes.do(spam_job)
+schedule.every(30).minutes.do(spam_job)   # ← sửa thành:
+schedule.every(1).minutes.do(spam_job)    # ← chỉ 1 phút/lần để test
 
 # Chạy nền
 def run_schedule():
@@ -60,4 +61,5 @@ def test(m):
     bot.reply_to(m, "Bot spam đang chạy 30 phút/lần – cực mạnh!")
 
 print("BOT SPAM 30 PHÚT 1 LẦN ĐÃ KHỞI ĐỘNG!")
+
 bot.infinity_polling()
