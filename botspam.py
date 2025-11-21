@@ -3,18 +3,21 @@ import schedule
 import time
 import random
 import threading
+import os
+from flask import Flask, request
 
-# ← DÁN TOKEN BOT MỚI VÀO ĐÂY
+# TOKEN bot spam
 TOKEN = "8339189762:AAG5thO3Rx4-0h-pyMRP1y2mWO4_dO9aMCY"
 bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
-# ← DÁN HÀNG NGHÌN ID NHÓM VÀO ĐÂY (mỗi dòng 1 ID)
+# Danh sách nhóm
 GROUP_IDS = [
-    -1002335996897,  # ← Kiểm tiền ko vốn UT-AT (đã gửi thành công)
+    -1002335996897,
     # Thêm nhóm khác ở đây...
 ]
 
-# 6 nội dung tin nhắn luân phiên để tránh bị report spam giống nhau
+# 6 nội dung quảng cáo
 MESSAGES = [
     "🎁 Bot mới: nhận mã quà tặng ngẫu nhiên từ 20K đến 200K mỗi ngày!\n@codenetwinbycvk_bot",
     "✨ Muốn nhận gift random 20K–200K? Vào thử bot này ngay 👉 @codenetwinbycvk_bot",
@@ -24,42 +27,48 @@ MESSAGES = [
     "🎉 Bot này phát quà ngẫu nhiên siêu vui, trị giá từ 20K đến 200K!\n@codenetwinbycvk_bot",
 ]
 
+
 def spam_job():
     sent = 0
-    random.shuffle(GROUP_IDS)  # trộn thứ tự nhóm mỗi lần gửi
+    random.shuffle(GROUP_IDS)
     for group_id in GROUP_IDS:
         try:
             msg = random.choice(MESSAGES)
             bot.send_message(group_id, msg)
             sent += 1
             print(f"Sent → {group_id}")
-            time.sleep(random.randint(9, 20))  # delay 9–20 giây mỗi tin
+            time.sleep(random.randint(9, 20))
         except Exception as e:
-            if "blocked" in str(e) or "kicked" in str(e) or "chat not found" in str(e):
-                print(f"Bot bị kick/ban khỏi nhóm {group_id}")
-            else:
-                print(f"Lỗi {group_id}: {e}")
+            print(f"Lỗi nhóm {group_id}: {e}")
             time.sleep(5)
-    print(f"HOÀN THÀNH 1 VÒNG – ĐÃ GỬI {sent}/{len(GROUP_IDS)} NHÓM – {time.strftime('%H:%M %d/%m')}")
+    print(f"HOÀN THÀNH – Gửi {sent}/{len(GROUP_IDS)} nhóm – {time.strftime('%H:%M %d/%m')}")
 
-# GỬI MỖI 30 PHÚT 1 LẦN – 48 LẦN/NGÀY
-schedule.every(30).minutes.do(spam_job)   # ← sửa thành:
-schedule.every(1).minutes.do(spam_job)    # ← chỉ 1 phút/lần để test
+# Gửi mỗi 1 phút để test (sau đổi lại 30)
+schedule.every(1).minutes.do(spam_job)
 
-# Chạy nền
 def run_schedule():
-    spam_job()  # gửi luôn lần đầu khi khởi động
+    spam_job()  # gửi luôn lần đầu
     while True:
         schedule.run_pending()
         time.sleep(30)
 
 threading.Thread(target=run_schedule, daemon=True).start()
 
-# Giữ Render sống + test
-@bot.message_handler(commands=['start', 'test'])
-def test(m):
-    bot.reply_to(m, "Bot spam đang chạy 30 phút/lần – cực mạnh!")
+# ==================== WEBHOOK CHO RENDER ====================
+@app.route('/' + TOKEN, methods=['POST'])
+def webhook():
+    update = telebot.types.Update.de_json(request.get_json())
+    bot.process_new_updates([update])
+    return "OK", 200
 
-print("BOT SPAM 30 PHÚT 1 LẦN ĐÃ KHỞI ĐỘNG!")
+@app.route("/")
+def index():
+    return "Bot spam NETWIN đang chạy mượt mà!", 200
 
-bot.infinity_polling()
+if __name__ == "__main__":
+    bot.remove_webhook()
+    time.sleep(2)
+    url = os.environ.get("RENDER_EXTERNAL_URL")
+    bot.set_webhook(url=f"{url}/{TOKEN}")
+    print(f"Webhook set: {url}/{TOKEN}")
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
