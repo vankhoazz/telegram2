@@ -14,17 +14,18 @@ app = Flask(__name__)
 # Danh sách nhóm
 GROUP_IDS = [
     -1002335996897,
-    # Thêm nhóm khác ở đây...
+    -100284434249,
+    -1002194454308,
 ]
 
 # 6 nội dung quảng cáo
 MESSAGES = [
-    "🎁 Bot mới: nhận mã quà tặng ngẫu nhiên từ 20K đến 200K mỗi ngày!\n@codenetwinbycvk_bot",
-    "✨ Muốn nhận gift random 20K–200K? Vào thử bot này ngay 👉 @codenetwinbycvk_bot",
-    "🔥 Bot đang phát mã quà ngẫu nhiên giá trị 20K–200K, thử vận may liền tay!\n@codenetwinbycvk_bot",
-    "💥 Làm vài thao tác nhẹ là có mã quà random từ 20K đến 200K!\n@codenetwinbycvk_bot",
-    "🚀 Nhận quà hoàn toàn miễn phí, random giá trị 20K–200K mỗi lần!\n@codenetwinbycvk_bot",
-    "🎉 Bot này phát quà ngẫu nhiên siêu vui, trị giá từ 20K đến 200K!\n@codenetwinbycvk_bot",
+    "🎁 Bot mới: nhận mã quà tặng ngẫu nhiên từ 20K đến 200K!\n@codenetwinbycvk_bot LINK: net68.win",
+    "✨ Muốn nhận gift random 20K–200K? Vào thử bot này ngay 👉 @codenetwinbycvk_bot LINK: net68.win",
+    "🔥 Bot chính hãng quà ngẫu nhiên giá trị 20K–200K, thử vận may liền tay!\n@codenetwinbycvk_bot LINK: net68.win",
+    "💥 Làm vài thao tác nhẹ là có mã quà random từ 20K đến 200K!\n@codenetwinbycvk_bot LINK: net68.win",
+    "🚀 Nhận quà hoàn toàn miễn phí, random giá trị 20K–200K mỗi lần!\n@codenetwinbycvk_bot LINK: net68.win",
+    "🎉 Bot này phát code trị giá từ 20K đến 200K nhanh tay nào!\n@codenetwinbycvk_bot LINK: net68.win",
 ]
 
 
@@ -60,7 +61,7 @@ def spam_job():
     print(f"HOÀN THÀNH VÒNG – Gửi {sent}/{len(GROUP_IDS)} nhóm có ảnh – {time.strftime('%H:%M %d/%m')}")
 
 # Gửi mỗi 1 phút để test (sau đổi lại 30)
-schedule.every(1).minutes.do(spam_job)
+schedule.every(30).minutes.do(spam_job)
 
 def run_schedule():
     spam_job()  # gửi luôn lần đầu
@@ -88,4 +89,5 @@ if __name__ == "__main__":
     bot.set_webhook(url=f"{url}/{TOKEN}")
     print(f"Webhook set: {url}/{TOKEN}")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
