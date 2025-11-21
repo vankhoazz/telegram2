@@ -31,17 +31,33 @@ MESSAGES = [
 def spam_job():
     sent = 0
     random.shuffle(GROUP_IDS)
+    
+    # Danh sách ảnh minh họa (thêm bao nhiêu ảnh cũng được)
+    proof_photos = ["proof1.jpg", "proof2.jpg" ]  # ← tên file anh vừa up
+    
     for group_id in GROUP_IDS:
         try:
             msg = random.choice(MESSAGES)
-            bot.send_message(group_id, msg)
+            photo_path = random.choice(proof_photos)  # chọn ngẫu nhiên 1 ảnh
+            
+            # Gửi ảnh + caption (chữ nằm dưới ảnh)
+            with open(photo_path, 'rb') as photo:
+                bot.send_photo(
+                    chat_id=group_id,
+                    photo=photo,
+                    caption=msg + "\n\nNhanh tay nhận quà miễn phí ngay hôm nay nào ",
+                    parse_mode='HTML'
+                )
+            
             sent += 1
-            print(f"Sent → {group_id}")
-            time.sleep(random.randint(9, 20))
+            print(f"Đã gửi ảnh + tin → {group_id}")
+            time.sleep(random.randint(12, 25))  # tăng delay lên vì gửi ảnh lâu hơn
+            
         except Exception as e:
             print(f"Lỗi nhóm {group_id}: {e}")
             time.sleep(5)
-    print(f"HOÀN THÀNH – Gửi {sent}/{len(GROUP_IDS)} nhóm – {time.strftime('%H:%M %d/%m')}")
+    
+    print(f"HOÀN THÀNH VÒNG – Gửi {sent}/{len(GROUP_IDS)} nhóm có ảnh – {time.strftime('%H:%M %d/%m')}")
 
 # Gửi mỗi 1 phút để test (sau đổi lại 30)
 schedule.every(1).minutes.do(spam_job)
@@ -72,3 +88,4 @@ if __name__ == "__main__":
     bot.set_webhook(url=f"{url}/{TOKEN}")
     print(f"Webhook set: {url}/{TOKEN}")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
